@@ -58,22 +58,22 @@ int main()
   wallFixDef.restitution = 0;
 
   b2BodyDef wallDef;
-  wallDef.type = b2_dynamicBody;
   b2Body* wall = world.CreateBody(&wallDef);
   wall->CreateFixture(&wallFixDef);
 
   b2BodyDef playerDef;
   playerDef.type = b2_dynamicBody;
-  playerDef.position.Set(50.0f, 10.0f);
+  playerDef.position.Set(20.0f, 20.0f);
   b2Body* player = world.CreateBody(&playerDef);
   b2PolygonShape playerBox;
   playerBox.SetAsBox(pw, ph);
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &playerBox;
-  fixtureDef.density = 1.0f;
-  fixtureDef.friction = 0.3f;
+  fixtureDef.density = 0.2f;
+  fixtureDef.friction = 0.5f;
+  fixtureDef.restitution = 0.99f;
   player->CreateFixture(&fixtureDef);
-  b2Vec2 force(-5000.0f, 1000.0f);
+  b2Vec2 force(-1000.0f, 1000.0f);
   player->ApplyForceToCenter(force, true);
 
   sf::RenderWindow window(sf::VideoMode(1250, 800), "SFML works!");
@@ -84,16 +84,17 @@ int main()
     b2Vec2 transformed = transformForDrawing(walls[i]);
     wallLines[i].position = sf::Vector2f(transformed.x, transformed.y);
     wallLines[i].color = sf::Color::Red;
-    printf("%4.2f %4.2f \n", transformed.x, transformed.y);
+    printf("walls: %4.2f %4.2f \n", walls[i].x, walls[i].y);
   }
 
-  printf("%4.2f %4.2f %4.2f %4.2f \n", wallLines.getBounds().left, wallLines.getBounds().top, wallLines.getBounds().width, wallLines.getBounds().height);
+  printf("wall bounds: %4.2f %4.2f %4.2f %4.2f \n", wallLines.getBounds().left, wallLines.getBounds().top, wallLines.getBounds().width, wallLines.getBounds().height);
 
   sf::RectangleShape playerR;
   playerR.setSize(sf::Vector2f(pw * DRAW_FACTOR, ph * DRAW_FACTOR));
   playerR.setFillColor(sf::Color::Green);
   b2Vec2 pPos = player->GetPosition();
   playerR.setPosition(pPos.x, pPos.y);
+  printf("player: %4.2f %4.2f \n", pPos.x, pPos.y);
 
   while (window.isOpen())
   {
