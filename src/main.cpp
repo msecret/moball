@@ -25,6 +25,8 @@ int main()
   fixtureDef.density = 1.0f;
   fixtureDef.friction = 0.3f;
   player->CreateFixture(&fixtureDef);
+  b2Vec2 force(50000.0f, 1.0f);
+  player->ApplyForceToCenter(force, true);
 
   sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
 
