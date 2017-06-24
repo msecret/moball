@@ -6,8 +6,8 @@
 const float DRAW_FACTOR = 10.0f;
 const float width = 60.0f;
 const float height = 36.0f;
-const float PLAYER_R = 0.35;
-const float BALL_R = 0.23;
+const float BALL_R = 1.38f;
+const float PLAYER_R = 2.1f;
 
 b2Vec2 transformForDrawing(const b2Vec2& val)
 {
@@ -26,8 +26,6 @@ int main()
   int32 velocityIterations = 6;
   int32 positionIterations = 2;
 
-  float pw = 5.0f;
-  float ph = 5.0f;
   b2Vec2 walls[16];
   // Extra padding added to walls so they're full on screen
   const float w = 40.0f;
@@ -61,20 +59,27 @@ int main()
   b2Body* wall = world.CreateBody(&wallDef);
   wall->CreateFixture(&wallFixDef);
 
-  b2BodyDef playerDef;
-  playerDef.type = b2_dynamicBody;
-  playerDef.position.Set(20.0f, 20.0f);
-  b2Body* player = world.CreateBody(&playerDef);
-  b2PolygonShape playerBox;
-  playerBox.SetAsBox(pw, ph);
-  b2FixtureDef fixtureDef;
-  fixtureDef.shape = &playerBox;
-  fixtureDef.density = 0.2f;
-  fixtureDef.friction = 0.5f;
-  fixtureDef.restitution = 0.99f;
-  player->CreateFixture(&fixtureDef);
-  b2Vec2 force(-1000.0f, 1000.0f);
-  player->ApplyForceToCenter(force, true);
+  b2CircleShape ballCircle;
+  ballCircle.m_radius = BALL_R;
+
+  b2FixtureDef ballFixDef;
+  ballFixDef.shape = &ballCircle;
+  ballFixDef.density = 0.2f;
+  ballFixDef.friction = 0.5f;
+  ballFixDef.restitution = 0.99f;
+
+  b2BodyDef ballDef;
+  ballDef.bullet = true;
+  ballDef.linearDamping = 0.35f;
+  ballDef.angularDamping = 0.6f;
+  ballDef.type = b2_dynamicBody;
+  ballDef.position.Set(20.0f, 20.0f);
+
+  b2Body* ball = world.CreateBody(&ballDef);
+  ball->CreateFixture(&ballFixDef);
+
+  b2Vec2 force(-1000.0f, 800.0f);
+  ball->ApplyForceToCenter(force, true);
 
   sf::RenderWindow window(sf::VideoMode(1250, 800), "SFML works!");
 
@@ -89,11 +94,10 @@ int main()
 
   printf("wall bounds: %4.2f %4.2f %4.2f %4.2f \n", wallLines.getBounds().left, wallLines.getBounds().top, wallLines.getBounds().width, wallLines.getBounds().height);
 
-  sf::RectangleShape playerR;
-  playerR.setSize(sf::Vector2f(pw * DRAW_FACTOR, ph * DRAW_FACTOR));
-  playerR.setFillColor(sf::Color::Green);
-  b2Vec2 pPos = player->GetPosition();
-  playerR.setPosition(pPos.x, pPos.y);
+  sf::CircleShape ballR;
+  ballR.setRadius(BALL_R * DRAW_FACTOR);
+  ballR.setFillColor(sf::Color::Red);
+  b2Vec2 pPos = ball->GetPosition();
   printf("player: %4.2f %4.2f \n", pPos.x, pPos.y);
 
   while (window.isOpen())
@@ -105,16 +109,16 @@ int main()
         window.close();
     }
     world.Step(timeStep, velocityIterations, positionIterations);
-    b2Vec2 pPos = player->GetPosition();
-    float32 pAngle = player->GetAngle();
-    //printf("%4.2f %4.2f %4.2f\n", pPos.x, pPos.y, pAngle);
+    b2Vec2 pPos = ball->GetPosition();
+    float32 pAngle = ball->GetAngle();
+    printf("%4.2f %4.2f %4.2f\n", pPos.x, pPos.y, pAngle);
 
     b2Vec2 transformedPos = transformForDrawing(pPos);
-    playerR.setPosition(transformedPos.x, transformedPos.y);
-    playerR.setRotation(pAngle);
+    ballR.setPosition(transformedPos.x, transformedPos.y);
+    ballR.setRotation(pAngle);
 
     window.clear();
-    window.draw(playerR);
+    window.draw(ballR);
     window.draw(wallLines);
     window.display();
   }
