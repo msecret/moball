@@ -25,7 +25,7 @@ int main()
   fixtureDef.density = 1.0f;
   fixtureDef.friction = 0.3f;
   player->CreateFixture(&fixtureDef);
-  b2Vec2 force(50000.0f, 1.0f);
+  b2Vec2 force(50000.0f, 10000.0f);
   player->ApplyForceToCenter(force, true);
 
   sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
@@ -48,6 +48,9 @@ int main()
     b2Vec2 pPos = player->GetPosition();
     float32 pAngle = player->GetAngle();
     printf("%4.2f %4.2f %4.2f\n", pPos.x, pPos.y, pAngle);
+
+    playerR.setPosition(pPos.x, pPos.y);
+    playerR.setRotation(pAngle);
 
     window.clear();
     window.draw(playerR);
