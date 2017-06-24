@@ -42,6 +42,10 @@ int main()
       if (event.type == sf::Event::Closed)
         window.close();
     }
+    world.Step(timeStep, velocityIterations, positionIterations);
+    b2Vec2 pPos = player->GetPosition();
+    float32 pAngle = player->GetAngle();
+    printf("%4.2f %4.2f %4.2f\n", pPos.x, pPos.y, pAngle);
 
     window.clear();
     window.draw(playerR);
