@@ -2,6 +2,15 @@
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
 
+const float DRAW_FACTOR = 10.0f;
+
+b2Vec2 transformForDrawing(const b2Vec2& val)
+{
+  b2Vec2 transformed;
+  transformed.x = val.x * DRAW_FACTOR;
+  transformed.y = val.y * DRAW_FACTOR;
+  return transformed;
+}
 
 int main()
 {
@@ -12,8 +21,8 @@ int main()
   int32 velocityIterations = 6;
   int32 positionIterations = 2;
 
-  float pw = 20.0f;
-  float ph = 20.0f;
+  float pw = 5.0f;
+  float ph = 5.0f;
   b2BodyDef playerDef;
   playerDef.type = b2_dynamicBody;
   playerDef.position.Set(10.0f, 10.0f);
@@ -25,13 +34,13 @@ int main()
   fixtureDef.density = 1.0f;
   fixtureDef.friction = 0.3f;
   player->CreateFixture(&fixtureDef);
-  b2Vec2 force(50000.0f, 10000.0f);
+  b2Vec2 force(5000.0f, 1000.0f);
   player->ApplyForceToCenter(force, true);
 
   sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
 
   sf::RectangleShape playerR;
-  playerR.setSize(sf::Vector2f(pw, ph));
+  playerR.setSize(sf::Vector2f(pw * DRAW_FACTOR, ph * DRAW_FACTOR));
   playerR.setFillColor(sf::Color::Green);
   b2Vec2 pPos = player->GetPosition();
   playerR.setPosition(pPos.x, pPos.y);
@@ -49,7 +58,8 @@ int main()
     float32 pAngle = player->GetAngle();
     printf("%4.2f %4.2f %4.2f\n", pPos.x, pPos.y, pAngle);
 
-    playerR.setPosition(pPos.x, pPos.y);
+    b2Vec2 transformedPos = transformForDrawing(pPos);
+    playerR.setPosition(transformedPos.x, transformedPos.y);
     playerR.setRotation(pAngle);
 
     window.clear();
@@ -59,3 +69,4 @@ int main()
 
   return 0;
 }
+
