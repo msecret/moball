@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
 
+#include "lib/Entity.h"
 
 const float DRAW_FACTOR = 10.0f;
 const float width = 60.0f;
