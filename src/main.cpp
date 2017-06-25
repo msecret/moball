@@ -3,11 +3,22 @@
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
 
+
 const float DRAW_FACTOR = 10.0f;
 const float width = 60.0f;
 const float height = 36.0f;
 const float BALL_R = 1.38f;
 const float PLAYER_R = 2.1f;
+
+/* TODO
+ * - Add a data structure to keep track of entity data rather then pulling from
+ *   both box2d and sfml.
+ * - Create some sort of data structure for the vectors and allow to transform
+ *   from box2d and sfml so don't have to think which is which.
+ * - Figure out positioning differences with example (from center vs from edge)
+ *   and fix.
+ * - Data structure to keep entities, update and render them.
+ */
 
 b2Vec2 transformForDrawing(const b2Vec2& val)
 {
@@ -26,6 +37,11 @@ int main()
   int32 velocityIterations = 6;
   int32 positionIterations = 2;
 
+
+  // TODO move to separate function or keep as separate data structure.
+  // TODO fix top wall not appearing.
+  // TODO figure out why extra padding needed and remove need for it (maybe by
+  // setting position from the center somehow.
   // Wall creation
   b2Vec2 walls[16];
   // Extra padding added to walls so they're full on screen
@@ -58,6 +74,9 @@ int main()
   wall->CreateFixture(&wallFixDef);
 
 
+  // TODO move to new function
+  // TODO remove beginning force.
+  // TODO center ball
   // Ball creation
   b2CircleShape ballCircle;
   ballCircle.m_radius = BALL_R;
@@ -77,6 +96,9 @@ int main()
   b2Vec2 force(-900.0f, 8.0f);
   ball->ApplyForceToCenter(force, true);
 
+
+  // TODO move to separate function.
+  // TODO fix positioning so correct.
   // Player creation
   b2CircleShape playerCircle;
   playerCircle.m_radius = PLAYER_R;
