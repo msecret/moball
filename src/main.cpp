@@ -123,7 +123,7 @@ int main()
   // Render ball
   sf::CircleShape ballR;
   ballR.setRadius(BALL_R * DRAW_FACTOR);
-  ballR.setFillColor(sf::Color::Red);
+  ballR.setFillColor(sf::Color::White);
   b2Vec2 pPos = ball->GetPosition();
 
 
