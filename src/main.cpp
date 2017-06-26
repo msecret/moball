@@ -29,6 +29,14 @@ b2Vec2 transformForDrawing(const b2Vec2& val)
   return transformed;
 }
 
+b2Vec2 transformForDrawing(float x, float y)
+{
+  b2Vec2 transformed;
+  transformed.x = x * DRAW_FACTOR;
+  transformed.y = y * DRAW_FACTOR;
+  return transformed;
+}
+
 int main()
 {
   b2Vec2 gravity(0.0f, 0.0f);
@@ -38,6 +46,7 @@ int main()
   int32 velocityIterations = 6;
   int32 positionIterations = 2;
 
+  std::vector<Entity*> entities;
 
   // TODO move to separate function or keep as separate data structure.
   // TODO fix top wall not appearing.
@@ -92,10 +101,10 @@ int main()
   ballDef.angularDamping = 0.6f;
   ballDef.type = b2_dynamicBody;
   ballDef.position.Set(20.0f, 20.0f);
-  b2Body* ball = world.CreateBody(&ballDef);
-  ball->CreateFixture(&ballFixDef);
-  b2Vec2 force(-900.0f, 8.0f);
-  ball->ApplyForceToCenter(force, true);
+  world.CreateBody(&ballDef)->CreateFixture(&ballFixDef);
+  Entity ball = Entity();
+  ball.getMoveable()->move(20.0f, 20.0f);
+  entities.push_back(&ball);
 
 
   // TODO move to separate function.
@@ -147,8 +156,6 @@ int main()
   sf::CircleShape ballR;
   ballR.setRadius(BALL_R * DRAW_FACTOR);
   ballR.setFillColor(sf::Color::White);
-  b2Vec2 pPos = ball->GetPosition();
-
 
   // Render players
   sf::CircleShape playerRs[5];
@@ -175,12 +182,11 @@ int main()
         window.close();
     }
     world.Step(timeStep, velocityIterations, positionIterations);
-    b2Vec2 pPos = ball->GetPosition();
-    float32 pAngle = ball->GetAngle();
+    float ballX = ball.getMoveable()->getX();
+    float ballY = ball.getMoveable()->getY();
 
-    b2Vec2 transformedPos = transformForDrawing(pPos);
+    b2Vec2 transformedPos = transformForDrawing(ballX, ballY);
     ballR.setPosition(transformedPos.x, transformedPos.y);
-    ballR.setRotation(pAngle);
 
     for(unsigned int i = 0; i < sizeof(playerBodies)/sizeof(playerBodies[0]); i = i + 1)
     {

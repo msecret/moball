@@ -1,7 +1,7 @@
 
 RDISTDIR ?= $(DISTDIR)
 
-OBJECTS := work.o
+OBJECTS := Entity.o
 DISTS = $(addprefix $(RDISTDIR)/,$(OBJECTS))
 
 TARGET := $(LIBNAME)
