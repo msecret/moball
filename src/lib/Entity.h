@@ -1,23 +1,38 @@
 
+#include <SFML/Graphics.hpp>
+#include <Box2D/Box2D.h>
+
 class Moveable {
   public:
-    Moveable();
-    Moveable(float x, float y);
+    Moveable(b2Body* body);
     float getX();
     float getY();
-    void move(float x, float y);
+    void setPos(float x, float y);
 
   private:
-    float x_;
-    float y_;
+    b2Body* body_;
+};
+
+class Renderable {
+  public:
+    Renderable(sf::Shape* shape);
+    void render(sf::RenderWindow* window);
+    void setPos(float x, float y);
+
+  private:
+    sf::Shape* shape_;
 };
 
 class Entity {
   public:
-    Entity();
+    Entity(Moveable* moveable, Renderable* renderable);
     ~Entity();
-    Moveable* getMoveable();
+    float getX();
+    float getY();
+    void setPos(float x, float y);
+    void render(sf::RenderWindow* window);
 
   private:
     Moveable* moveable_;
+    Renderable* renderable_;
 };

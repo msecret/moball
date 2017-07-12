@@ -29,13 +29,6 @@ b2Vec2 transformForDrawing(const b2Vec2& val)
   return transformed;
 }
 
-b2Vec2 transformForDrawing(float x, float y)
-{
-  b2Vec2 transformed;
-  transformed.x = x * DRAW_FACTOR;
-  transformed.y = y * DRAW_FACTOR;
-  return transformed;
-}
 
 int main()
 {
@@ -101,10 +94,16 @@ int main()
   ballDef.angularDamping = 0.6f;
   ballDef.type = b2_dynamicBody;
   ballDef.position.Set(20.0f, 20.0f);
-  world.CreateBody(&ballDef)->CreateFixture(&ballFixDef);
-  Entity ball = Entity();
-  ball.getMoveable()->move(20.0f, 20.0f);
-  entities.push_back(&ball);
+  b2Body* ballBody = world.CreateBody(&ballDef);
+  ballBody->CreateFixture(&ballFixDef);
+  // Render ball
+  sf::CircleShape ballR;
+  ballR.setRadius(BALL_R * DRAW_FACTOR);
+  ballR.setFillColor(sf::Color::White);
+  Entity ball = Entity(
+    new Moveable(ballBody),
+    new Renderable(&ballR)
+  );
 
 
   // TODO move to separate function.
@@ -131,10 +130,20 @@ int main()
   b2Body* playerBodies[5];
   for(unsigned int i = 0; i < sizeof(playerVecs)/sizeof(playerVecs[0]); i = i + 1)
   {
+    // TODO how to remove this and use in entity?
     playerDef.position.Set(playerVecs[i].x, playerVecs[i].y);
-    b2Body* player = world.CreateBody(&playerDef);
-    player->CreateFixture(&playerFixDef);
-    playerBodies[i] = player;
+    b2Body* playerBody = world.CreateBody(&playerDef);
+    playerBody->CreateFixture(&playerFixDef);
+    playerBodies[i] = playerBody;
+    playerDef.position.Set(playerVecs[i].x, playerVecs[i].y);
+    sf::CircleShape playerR;
+    playerR.setRadius(PLAYER_R * DRAW_FACTOR);
+    playerR.setFillColor(sf::Color::Blue);
+    Entity player = Entity(
+      new Moveable(playerBody),
+      new Renderable(&playerR)
+    );
+    playerBody->SetUserData(&player);
   }
 
 
@@ -152,27 +161,6 @@ int main()
   printf("wall bounds: %4.2f %4.2f %4.2f %4.2f \n", wallLines.getBounds().left, wallLines.getBounds().top, wallLines.getBounds().width, wallLines.getBounds().height);
 
 
-  // Render ball
-  sf::CircleShape ballR;
-  ballR.setRadius(BALL_R * DRAW_FACTOR);
-  ballR.setFillColor(sf::Color::White);
-
-  // Render players
-  sf::CircleShape playerRs[5];
-  for(unsigned int i = 0; i < sizeof(playerBodies)/sizeof(playerBodies[0]); i = i + 1)
-  {
-    sf::CircleShape playerR;
-    playerR.setRadius(PLAYER_R * DRAW_FACTOR);
-    playerR.setFillColor(sf::Color::Blue);
-    playerRs[i] = playerR;
-    b2Vec2 pPos = playerBodies[i]->GetPosition();
-    b2Vec2 transformedPos = transformForDrawing(pPos);
-    playerRs[i].setPosition(transformedPos.x, transformedPos.y);
-    printf("player: %4.2f %4.2f \n", pPos.x, pPos.y);
-    printf("player transformed: %4.2f %4.2f \n", transformedPos.x, transformedPos.y);
-  }
-
-
   while (window.isOpen())
   {
     sf::Event event;
@@ -182,26 +170,17 @@ int main()
         window.close();
     }
     world.Step(timeStep, velocityIterations, positionIterations);
-    float ballX = ball.getMoveable()->getX();
-    float ballY = ball.getMoveable()->getY();
-
-    b2Vec2 transformedPos = transformForDrawing(ballX, ballY);
-    ballR.setPosition(transformedPos.x, transformedPos.y);
-
-    for(unsigned int i = 0; i < sizeof(playerBodies)/sizeof(playerBodies[0]); i = i + 1)
-    {
-      b2Vec2 pPos = playerBodies[i]->GetPosition();
-      b2Vec2 transformedPos = transformForDrawing(pPos);
-      playerRs[i].setPosition(transformedPos.x, transformedPos.y);
-    }
+    b2Body* bodies = world.GetBodyList();
 
     window.clear();
-    window.draw(ballR);
-    window.draw(wallLines);
-    for(unsigned int i = 0; i < sizeof(playerRs)/sizeof(playerRs[0]); i = i + 1)
-    {
-      window.draw(playerRs[i]);
+    while (bodies->GetNext() != NULL) {
+      void* bodyUserData= bodies->GetUserData();
+      if ( bodyUserData ) {
+        Entity* entity = static_cast<Entity*>(bodyUserData);
+        entity->render(&window);
+      }
     }
+    window.draw(wallLines);
 
     window.display();
   }

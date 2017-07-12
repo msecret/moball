@@ -1,42 +1,75 @@
 
 #include "Entity.h"
 
-Moveable::Moveable() :
-  x_(0),
-  y_(0)
-{}
+const float DRAW_FACTOR = 10.0f;
 
-Moveable::Moveable(float x, float y) :
-  x_(x),
-  y_(y)
+
+Moveable::Moveable(b2Body* body) :
+  body_(body)
 {}
 
 float Moveable::getX()
 {
-  return x_;
+  return body_->GetPosition().x;
 }
 
 float Moveable::getY()
 {
-  return y_;
+  return body_->GetPosition().x;
 }
 
-void Moveable::move(float x, float y)
+void Moveable::setPos(float x, float y)
 {
-  x_ = x;
-  y_ = y;
+  return body_->SetTransform(b2Vec2(x, y), 0);
 }
 
-Entity::Entity() :
-  moveable_(new Moveable)
+Renderable::Renderable(sf::Shape* shape) :
+  shape_(shape)
+{ }
+
+void Renderable::render(sf::RenderWindow* window)
+{
+  window->draw(*shape_);
+}
+
+void Renderable::setPos(float x, float y)
+{
+  float tx = x * DRAW_FACTOR;
+  float ty = y * DRAW_FACTOR;
+  shape_->setPosition(tx, ty);
+}
+
+
+Entity::Entity(Moveable* moveable, Renderable* renderable) :
+  renderable_(renderable),
+  moveable_(moveable)
 {}
 
 Entity::~Entity()
 {
   delete moveable_;
+  delete renderable_;
 }
 
-Moveable* Entity::getMoveable()
+float Entity::getX()
 {
-  return moveable_;
+  return moveable_->getX();
+}
+
+float Entity::getY()
+{
+  return moveable_->getY();
+}
+
+void Entity::setPos(float x, float y)
+{
+  moveable_->setPos(x, y);
+}
+
+void Entity::render(sf::RenderWindow* window)
+{
+  float posX = getX();
+  float posY = getY();
+  renderable_->setPos(posX, posY);
+  renderable_->render(window);
 }
