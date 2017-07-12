@@ -1,0 +1,1 @@
+-Wall -g -std=c++11 -lpthread -L/usr/lib -Wl,-Bstatic -lBox2D -Wl,-Bdynamic -L/usr/lib -lsfml-graphics -lsfml-window -lsfml-system -Wl,--no-undefined -lm -ldl -lpthread -lrt -L/usr/local/lib
